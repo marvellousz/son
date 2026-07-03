@@ -37,6 +37,10 @@ it has an agent reasoning loop under the hood, meaning it doesn't just match key
 ### 📰 news feeds
 - fetches news from google news rss based on whatever search query you want.
 
+### 📂 local filesystem access
+- read text files and list directory contents on your local laptop.
+- supports path expansion (e.g., `~/documents` or relative/absolute paths) and line capping to prevent context overflow.
+
 ### 🌅 daily summary
 - run `/daily` to get a neat summary of everything you did in the last 24 hours: completed tasks, scheduled reminders, and notes created.
 
@@ -112,17 +116,19 @@ you can talk to the bot in natural language, or use these commands directly (**`
 | --- | --- | --- |
 | `/start` | registers you and shows welcome screen | `/start` |
 | `/help` / `!help` | shows the help menu | `!help` |
-| `/todo add` / `!todo add <title>` | adds a task to your checklist | `!todo add buy milk` |
-| `/todo list` / `!todo list` | lists pending/completed/all tasks | `!todo list pending` |
-| `/todo done` / `!todo done <id>` | completes a task by its database id | `!todo done 1` |
-| `/remind` / `!remind <time> <msg>` | schedules a reminder notification | `!remind tomorrow 8pm gym` |
-| `/note` / `!note <text>` | saves a note (prefix `work` or `personal` to force category) | `!note work discuss project goals` |
-| `/search` / `!search <query>` | searches your notes for a keyword | `!search project` |
-| `/google` / `!google <query>` | searches the web for live answers | `!google who won the game last night` |
-| `/profile` / `!profile <w> <h> <g>` | sets up your body profile & goals | `!profile 80 180 cut` |
-| `/eat` / `!eat <meal> <cal> <p> <name>` | logs food eaten | `!eat lunch 600 40 chicken rice` |
-| `/macros` / `!macros` | shows calorie/protein progress bar dashboard | `!macros` |
-| `/daily` / `!daily` | summarizes your last 24h activity | `!daily` |
+| `/todo add` / `!todo add <title>` | adds a task to your checklist | `/todo add buy milk` |
+| `/todo list` / `!todo list` | lists pending/completed/all tasks | `/todo list pending` |
+| `/todo done` / `!todo done <id>` | completes a task by its database id | `/todo done 1` |
+| `/remind` / `!remind <time> <msg>` | schedules a reminder notification | `/remind tomorrow 8pm gym` |
+| `/note` / `!note <text>` | saves a note (prefix `work` or `personal` to force category) | `/note work discuss project goals` |
+| `/search` / `!search <query>` | searches your notes for a keyword | `/search project` |
+| `/google` / `!google <query>` | searches the web for live answers | `/google who won the game last night` |
+| `/profile` / `!profile <w> <h> <g>` | sets up your body profile & goals | `/profile 80 180 cut` |
+| `/eat` / `!eat <meal> <cal> <p> <name>` | logs food eaten | `/eat lunch 600 40 chicken rice` |
+| `/macros` / `!macros` | shows calorie/protein progress bar dashboard | `/macros` |
+| `/daily` / `!daily` | summarizes your last 24h activity | `/daily` |
+| (natural language) | lists files in any folder on your laptop | `show me what is in ~/downloads` |
+| (natural language) | reads the content of a local file | `read main.py` |
 
 ---
 

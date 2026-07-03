@@ -11,6 +11,7 @@ from app.tools import (
     fetch_webpage,
     profile,
     calories,
+    filesystem,
 )
 
 __all__ = [
@@ -27,4 +28,5 @@ __all__ = [
     "fetch_webpage",
     "profile",
     "calories",
+    "filesystem",
 ]
