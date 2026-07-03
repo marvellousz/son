@@ -1,0 +1,22 @@
+# virtual env
+.venv/
+venv/
+ENV/
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ruff_cache/
+
+# environment files (contains secrets!)
+.env
+.env.*
+!.env.example
+
+# local database files
+data/*.db
+data/*.db-journal
+data/*.db-shm
+data/*.db-wal

@@ -1,0 +1,21 @@
+services:
+  assistant:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: son_assistant
+    # Using host networking on Linux allows seamless connection to local host Ollama (localhost:11434)
+    # and opens the FastAPI app port 8000 directly on the host network.
+    network_mode: "host"
+    volumes:
+      # Persist SQLite databases and markdown notes
+      - ../data:/app/data
+      - ../knowledge:/app/knowledge
+      # Map environment configs
+      - ../.env:/app/.env
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
