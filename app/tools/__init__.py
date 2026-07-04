@@ -12,6 +12,7 @@ from app.tools import (
     profile,
     calories,
     filesystem,
+    clipboard,
 )
 
 __all__ = [
@@ -29,4 +30,6 @@ __all__ = [
     "profile",
     "calories",
     "filesystem",
+    "clipboard",
 ]
+

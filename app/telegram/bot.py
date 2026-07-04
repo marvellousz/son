@@ -15,6 +15,9 @@ from app.telegram.handlers import (
     profile_handler,
     eat_handler,
     macros_handler,
+    clip_handler,
+    find_handler,
+    send_file_handler,
 )
 
 logger = logging.getLogger(__name__)
@@ -56,6 +59,9 @@ def init_bot() -> Application | None:
     bot_app.add_handler(CommandHandler("eat", eat_handler))
     bot_app.add_handler(CommandHandler("macros", macros_handler))
     bot_app.add_handler(CommandHandler("daily", daily_handler))
+    bot_app.add_handler(CommandHandler("clip", clip_handler))
+    bot_app.add_handler(CommandHandler("find", find_handler))
+    bot_app.add_handler(CommandHandler("send", send_file_handler))
 
     # Natural language chat message handler
     bot_app.add_handler(

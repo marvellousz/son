@@ -18,6 +18,14 @@ from app.tools.calories import (
     get_daily_macros as tool_get_daily_macros,
 )
 from app.agent.agent import SonAgent
+from app.tools.clipboard import (
+    get_clipboard_history as tool_get_clipboard,
+    write_to_clipboard as tool_write_clipboard,
+)
+from app.tools.filesystem import (
+    fuzzy_find_local_file as tool_find_files,
+    send_local_file as tool_send_file,
+)
 from app.database.session import get_db_ctx
 from app.database.models import Conversation
 from app.tools.todo import get_or_create_user
@@ -27,18 +35,27 @@ logger = logging.getLogger(__name__)
 
 async def safe_reply_markdown(update: Update, text: str) -> None:
     """Send a markdown message to the user, falling back to plain text if formatting is invalid."""
+    import re
+    
+    # Escape underscores that are outside of backticks (code blocks / inline code)
+    parts = text.split("`")
+    for i in range(len(parts)):
+        if i % 2 == 0:
+            parts[i] = re.sub(r'(?<!\\)_', r'\_', parts[i])
+    escaped_text = "`".join(parts)
+
     try:
-        await update.message.reply_text(text, parse_mode="Markdown")
+        await update.message.reply_text(escaped_text, parse_mode="Markdown")
     except BadRequest as e:
         if "Can't parse entities" in str(e) or "can't parse" in str(e).lower():
             logger.warning(
-                "Markdown parsing failed, falling back to plain text.",
-                exc_info=True,
+                f"Markdown parsing failed for text, falling back to plain text. Error: {e}"
             )
             clean_text = text.replace("*", "").replace("_", "").replace("`", "")
             await update.message.reply_text(clean_text)
         else:
             raise e
+
 
 
 def get_user_history(db, user_id: int, limit: int = 10) -> list:
@@ -392,3 +409,67 @@ async def macros_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await update.message.reply_chat_action("typing")
     res = tool_get_daily_macros(date_str=date_str, telegram_id=chat_id)
     await safe_reply_markdown(update, res)
+
+
+async def clip_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /clip command to sync laptop clipboard."""
+    chat_id = update.effective_chat.id
+    args = context.args
+
+    await update.message.reply_chat_action("typing")
+
+    if not args:
+        # Show history and active clipboard
+        res = tool_get_clipboard(limit=5, telegram_id=chat_id)
+    else:
+        # User wants to copy text
+        if args[0].lower() == "copy" and len(args) > 1:
+            text_to_copy = " ".join(args[1:])
+        else:
+            text_to_copy = " ".join(args)
+            
+        res = tool_write_clipboard(text=text_to_copy, telegram_id=chat_id)
+        
+    await safe_reply_markdown(update, res)
+
+
+async def find_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /find command to search files on laptop."""
+    chat_id = update.effective_chat.id
+    args = context.args
+
+    if not args:
+        await safe_reply_markdown(
+            update, "Usage: `/find <query> [start_path]`\nExample: `/find DECISIONS ~/downloads`"
+        )
+        return
+
+    query = args[0]
+    path = args[1] if len(args) > 1 else "~"
+
+    await update.message.reply_chat_action("typing")
+    res = tool_find_files(query=query, path=path, telegram_id=chat_id)
+    await safe_reply_markdown(update, res)
+
+
+async def send_file_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /send command to transfer local file to chat."""
+    chat_id = update.effective_chat.id
+    args = context.args
+
+    if not args:
+        await safe_reply_markdown(
+            update, "Usage: `/send <file_path>`\nExample: `/send ~/downloads/son.jpg`"
+        )
+        return
+
+    file_path = args[0]
+    await update.message.reply_chat_action("upload_document")
+    
+    res = await asyncio.to_thread(tool_send_file, path=file_path, telegram_id=chat_id)
+    
+    if "Error:" in res or "successfully" not in res:
+        await safe_reply_markdown(update, res)
+
+
+

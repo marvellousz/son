@@ -9,6 +9,7 @@ from app.api.routes import router as api_router
 from app.scheduler.tasks import start_scheduler, scheduler
 from app.telegram.bot import start_bot, stop_bot
 from app.discord_bot.bot import start_discord_bot, stop_discord_bot
+from app.tools.clipboard import start_clipboard_monitor
 from alembic.config import Config
 from alembic import command
 
@@ -38,6 +39,9 @@ async def lifespan(app: FastAPI):
 
     # 2. Start Background task scheduler
     start_scheduler()
+
+    # 3. Start Laptop Clipboard Synchronization Monitor
+    start_clipboard_monitor()
 
     # 3. Start Telegram Bot Polling loop in background task
     bot_task = asyncio.create_task(start_bot())

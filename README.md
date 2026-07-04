@@ -41,6 +41,10 @@ it has an agent reasoning loop under the hood, meaning it doesn't just match key
 - read text files and list directory contents on your local laptop.
 - supports path expansion (e.g., `~/documents` or relative/absolute paths) and line capping to prevent context overflow.
 
+### 📋 laptop clipboard sync
+- background daemon thread monitors your laptop's wayland clipboard (`wl-paste`) and logs copied snippets to SQLite.
+- pull clipboard history (last 5 entries) or send a copy command to write text directly to your laptop's clipboard (`wl-copy`).
+
 ### 🌅 daily summary
 - run `/daily` to get a neat summary of everything you did in the last 24 hours: completed tasks, scheduled reminders, and notes created.
 
@@ -127,6 +131,10 @@ you can talk to the bot in natural language, or use these commands directly (**`
 | `/eat` / `!eat <meal> <cal> <p> <name>` | logs food eaten | `/eat lunch 600 40 chicken rice` |
 | `/macros` / `!macros` | shows calorie/protein progress bar dashboard | `/macros` |
 | `/daily` / `!daily` | summarizes your last 24h activity | `/daily` |
+| `/clip` / `!clip` | views current laptop clipboard and history | `!clip` |
+| `/clip copy` / `!clip copy <text>` | copies text directly to your laptop | `!clip copy hello world` |
+| `/find` / `!find <query> [path]` | fuzzy searches files/directories on your laptop | `/find DECISIONS ~/downloads` |
+| `/send` / `!send <file_path>` | uploads and sends any file from laptop filesystem to chat | `/send ~/downloads/son.jpg` |
 | (natural language) | lists files in any folder on your laptop | `show me what is in ~/downloads` |
 | (natural language) | reads the content of a local file | `read main.py` |
 

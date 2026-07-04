@@ -21,6 +21,10 @@ from app.tools.calories import (
     log_food as tool_log_food,
     get_daily_macros as tool_get_daily_macros,
 )
+from app.tools.clipboard import (
+    get_clipboard_history as tool_get_clipboard,
+    write_to_clipboard as tool_write_clipboard,
+)
 from app.telegram.handlers import get_user_history, save_message
 
 logger = logging.getLogger(__name__)
@@ -274,6 +278,46 @@ async def init_bot() -> commands.Bot | None:
         async with ctx.typing():
             res = tool_generate_daily_summary(telegram_id=ctx.author.id)
         await ctx.send(res)
+
+    @discord_bot.group(name="clip", invoke_without_command=True)
+    async def clip_group(ctx, *, args: str = None):
+        async with ctx.typing():
+            if not args:
+                res = tool_get_clipboard(limit=5, telegram_id=ctx.author.id)
+            else:
+                res = tool_write_clipboard(text=args, telegram_id=ctx.author.id)
+        await ctx.send(res)
+
+    @clip_group.command(name="copy")
+    async def clip_copy(ctx, *, text: str = None):
+        if not text:
+            await ctx.send("usage: `!clip copy <text>`")
+            return
+        async with ctx.typing():
+            res = tool_write_clipboard(text=text, telegram_id=ctx.author.id)
+        await ctx.send(res)
+
+    @discord_bot.command(name="find")
+    async def find_cmd(ctx, query: str = None, path: str = "~"):
+        if not query:
+            await ctx.send("usage: `!find <query> [start_path]`\nexample: `!find DECISIONS ~/downloads`")
+            return
+        async with ctx.typing():
+            from app.tools.filesystem import fuzzy_find_local_file as tool_find
+            res = tool_find(query=query, path=path, telegram_id=ctx.author.id)
+        await ctx.send(res)
+
+    @discord_bot.command(name="send")
+    async def send_cmd(ctx, path: str = None):
+        if not path:
+            await ctx.send("usage: `!send <file_path>`\nexample: `!send ~/downloads/son.jpg`")
+            return
+        async with ctx.typing():
+            from app.tools.filesystem import send_local_file as tool_send
+            res = await asyncio.to_thread(tool_send, path=path, telegram_id=ctx.author.id)
+            
+        if "Error:" in res or "successfully" not in res:
+            await ctx.send(res)
 
     return discord_bot
 
